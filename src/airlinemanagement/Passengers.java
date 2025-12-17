@@ -39,7 +39,7 @@ public class Passengers extends javax.swing.JFrame {
     ResultSet Rs = null, Rs1 = null;
     Statement St = null, St1 = null;
     
-    private void DisplayPassengers(){
+private void DisplayPassengers(){
         try {
             Con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/airlinedb","root","");
             St = Con.createStatement();
