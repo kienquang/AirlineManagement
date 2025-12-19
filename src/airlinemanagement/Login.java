@@ -8,13 +8,19 @@ import javax.swing.JOptionPane;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
+import  java.net.*;
+import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Q.Kiên
  */
 public class Login extends javax.swing.JFrame {
+    static  void initSocket() throws Exception {
+        socketClient.connect();
+    }
 
     /**
      * Creates new form Login
@@ -22,6 +28,7 @@ public class Login extends javax.swing.JFrame {
     public Login() {
         initComponents();
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -206,7 +213,14 @@ public class Login extends javax.swing.JFrame {
         ResultSet rs = pst.executeQuery();
 
         if (rs.next()) {
+            String userName = rs.getString("username");
+            int role = rs.getInt("isAdmin");
+            currentUser user = new  currentUser();
+            user.setUserName(userName);
+            user.setRole(role);
+            userSesion.getInstance().setUser(user);
             new MainForm().setVisible(true);
+            socketClient.send("LOGIN:" + username);
             this.dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Sai tài khoản hoặc mật khẩu");
@@ -248,7 +262,11 @@ public class Login extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        try {
+                initSocket();
+                } catch (Exception ex) {
+                    Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+                }
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {

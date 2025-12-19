@@ -3,16 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/ADMIN/Desktop/AirlineManagement-master/src/airlinemanagement/TicketBooking.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/AirlineManagement-master/src/airlinemanagement/Flights.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/AirlineManagement-master/src/airlinemanagement/Cancellation.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/AirlineManagement-master/src/airlinemanagement/Login.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/AirlineManagement-master/src/airlinemanagement/DBConnection.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/AirlineManagement-master/src/airlinemanagement/AirlineApp.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/AirlineManagement-master/src/airlinemanagement/MainForm.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/AirlineManagement-master/src/airlinemanagement/Passengers.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/AirlineManagement-master/src/airlinemanagement/Splash.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/AirlineManagement-master/src/airlinemanagement/AirlineManagement.java</file>
+            <file>file:/F:/Download/Zalo%20Received%20Files/AirlineManagement-master/src/airlinemanagement/userSesion.java</file>
+            <file>file:/F:/Download/Zalo%20Received%20Files/AirlineManagement-master/src/airlinemanagement/Login.java</file>
+            <file>file:/F:/Download/Zalo%20Received%20Files/AirlineManagement-master/src/airlinemanagement/MainForm.java</file>
+            <file>file:/F:/Download/Zalo%20Received%20Files/AirlineManagement-master/src/airlinemanagement/chatWindows.java</file>
+            <file>file:/F:/Download/Zalo%20Received%20Files/AirlineManagement-master/src/airlinemanagement/socketClient.java</file>
+            <file>file:/F:/Download/Zalo%20Received%20Files/AirlineManagement-master/src/airlinemanagement/ServerListener.java</file>
         </group>
     </open-files>
 </project-private>
