@@ -10,10 +10,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import net.proteanit.sql.DbUtils;import javax.swing.table.DefaultTableCellRenderer;
+import net.proteanit.sql.DbUtils;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.Component;
 import javax.swing.JTable;
-
 
 /**
  *
@@ -408,32 +408,31 @@ public class staffForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    private void DisplayStaffs(){
+    private void DisplayStaffs() {
         try {
             Con = DBConnection.getConnection();
             St = Con.createStatement();
             Rs = St.executeQuery("SELECT * FROM users");
             StaffTable1.setModel(DbUtils.resultSetToTableModel(Rs));
             StaffTable1.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, 
-                    boolean isSelected, boolean hasFocus, int row, int column) {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value,
+                        boolean isSelected, boolean hasFocus, int row, int column) {
 
-                // Chuyển nội dung hiển thị thành dấu *
-                if (value != null) {
-                    value = "********"; 
-                    // Hoặc: value = "•".repeat(value.toString().length()); (Java 11+)
-                }
+                    // Chuyển nội dung hiển thị thành dấu *
+                    if (value != null) {
+                        value = "********";
+                        // Hoặc: value = "•".repeat(value.toString().length()); (Java 11+)
+                    }
 
-                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 }
             });
+        } catch (Exception e) {
         }
-        catch (Exception e) {
-        }
-        }
-    private void Clear()
-    {
+    }
+
+    private void Clear() {
         StaffNameTb.setText("");
         StaffAddressTb.setText("");
         PasswordField.setText("");
@@ -443,8 +442,8 @@ public class staffForm extends javax.swing.JFrame {
         StaffGenCb.setSelectedIndex(-1);
     }
     private void SaveBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SaveBtnMouseClicked
-        if(!PasswordField.getText().equals(ConfirmPasswordField.getText())){ 
-            JOptionPane.showMessageDialog(null,"Password is not the same with confirmed password !");
+        if (!PasswordField.getText().equals(ConfirmPasswordField.getText())) {
+            JOptionPane.showMessageDialog(null, "Password is not the same with confirmed password !");
             return;
         }
         if (Key != 0) {
@@ -456,10 +455,9 @@ public class staffForm extends javax.swing.JFrame {
                 Add.setInt(8, Key);
                 Add.setString(1, StaffNameTb.getText());
                 Add.setString(2, PasswordField.getText());
-                if(roleCb.getSelectedItem().toString().equals("Admin")){
-                     Add.setInt(3, 1);
-                }
-                else{
+                if (roleCb.getSelectedItem().toString().equals("Admin")) {
+                    Add.setInt(3, 1);
+                } else {
                     Add.setInt(3, 0);
                 }
                 Add.setString(4, StaffNatCb.getSelectedItem().toString());
@@ -475,18 +473,15 @@ public class staffForm extends javax.swing.JFrame {
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, e);
             }
-        } else
-        if(StaffNameTb.getText().isEmpty() || PasswordField.getText().isEmpty() || StaffAddressTb.getText().isEmpty() || StaffPhoneTb.getText().isEmpty() || StaffGenCb.getSelectedIndex()== -1 || StaffNatCb.getSelectedIndex()== -1 || roleCb.getSelectedIndex() == -1)
-        {
+        } else if (StaffNameTb.getText().isEmpty() || PasswordField.getText().isEmpty() || StaffAddressTb.getText().isEmpty() || StaffPhoneTb.getText().isEmpty() || StaffGenCb.getSelectedIndex() == -1 || StaffNatCb.getSelectedIndex() == -1 || roleCb.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this, "Missing Information");
-        }else
-        {
+        } else {
             try {
                 Con = DBConnection.getConnection();
                 PreparedStatement Add = Con.prepareStatement("insert into users (username, password, isAdmin, nationality, gender, address, phone) VALUES (?, ?, ?, ?, ?, ?, ?)");;
                 Add.setString(1, StaffNameTb.getText());
                 Add.setString(2, PasswordField.getText());
-                Add.setInt(3,0);
+                Add.setInt(3, 0);
                 Add.setString(4, StaffNatCb.getSelectedItem().toString());
                 Add.setString(5, StaffGenCb.getSelectedItem().toString());
                 Add.setString(6, StaffAddressTb.getText());
@@ -507,16 +502,15 @@ public class staffForm extends javax.swing.JFrame {
     }//GEN-LAST:event_SaveBtnActionPerformed
     int Key = 0;
     private void StaffTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_StaffTable1MouseClicked
-        DefaultTableModel model = (DefaultTableModel)StaffTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) StaffTable1.getModel();
         int MyIndex = StaffTable1.getSelectedRow(); // Lưu ý: trong ảnh là .getSelectedRow thiếu ()
         Key = Integer.parseInt(model.getValueAt(MyIndex, 0).toString());
         StaffNameTb.setText(model.getValueAt(MyIndex, 1).toString());
         PasswordField.setText(model.getValueAt(MyIndex, 2).toString());
         ConfirmPasswordField.setText(model.getValueAt(MyIndex, 2).toString());
-        if(Integer.valueOf(model.getValueAt(MyIndex, 3).toString())  == 1){
+        if (Integer.valueOf(model.getValueAt(MyIndex, 3).toString()) == 1) {
             roleCb.setSelectedItem("Admin");
-        }
-        else{
+        } else {
             roleCb.setSelectedItem("Staff");
         }
         StaffNatCb.setSelectedItem(model.getValueAt(MyIndex, 4).toString());
@@ -526,20 +520,62 @@ public class staffForm extends javax.swing.JFrame {
     }//GEN-LAST:event_StaffTable1MouseClicked
 
     private void DeleteBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DeleteBtnMouseClicked
-        if(Key == 0){
-            JOptionPane.showMessageDialog(this, "select a passenger");
-        }else{
-            try {
-                Con = DBConnection.getConnection();
-                String Query = "Delete from users where id=" + Key;
-                Statement Del = Con.createStatement();
-                Del.executeUpdate(Query);
-                JOptionPane.showMessageDialog(this, "Staff Deleted");
-                DisplayStaffs();
-                Clear();
-                Key = 0;
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, e);
+        if (Key == 0) {
+            JOptionPane.showMessageDialog(this, "Select a staff to delete");
+        } else {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Xóa nhân viên này sẽ xóa toàn bộ tin nhắn và hội thoại liên quan. Bạn chắc chứ?",
+                    "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    Con = DBConnection.getConnection();
+                    Con.setAutoCommit(false); // Bắt đầu Transaction
+
+                    // 1. Xóa tin nhắn thuộc về các hội thoại của User này
+                    // Bảng 'messages' tham chiếu 'conversations'
+                    String delMessages = "DELETE FROM messages WHERE conversation_id IN "
+                            + "(SELECT id FROM conversations WHERE user1_id = ? OR user2_id = ?)";
+                    java.sql.PreparedStatement ps1 = Con.prepareStatement(delMessages);
+                    ps1.setInt(1, Key);
+                    ps1.setInt(2, Key);
+                    ps1.executeUpdate();
+
+                    // 2. Xóa các hội thoại của User này
+                    // Bảng 'conversations' tham chiếu 'users'
+                    String delConvs = "DELETE FROM conversations WHERE user1_id = ? OR user2_id = ?";
+                    java.sql.PreparedStatement ps2 = Con.prepareStatement(delConvs);
+                    ps2.setInt(1, Key);
+                    ps2.setInt(2, Key);
+                    ps2.executeUpdate();
+
+                    // 3. Cuối cùng mới xóa User trong bảng 'users'
+                    String delUser = "DELETE FROM users WHERE id = ?";
+                    java.sql.PreparedStatement ps3 = Con.prepareStatement(delUser);
+                    ps3.setInt(1, Key);
+                    ps3.executeUpdate();
+
+                    Con.commit(); // Hoàn tất quá trình xóa sạch dữ liệu
+
+                    JOptionPane.showMessageDialog(this, "Staff and all related data deleted");
+                    DisplayStaffs();
+                    Clear();
+                    Key = 0;
+                } catch (Exception e) {
+                    try {
+                        if (Con != null) {
+                            Con.rollback(); // Nếu lỗi thì khôi phục lại dữ liệu
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+                } finally {
+                    try {
+                        Con.setAutoCommit(true);
+                    } catch (Exception e) {
+                    }
+                }
             }
         }
     }//GEN-LAST:event_DeleteBtnMouseClicked
@@ -584,28 +620,26 @@ public class staffForm extends javax.swing.JFrame {
             Con = DBConnection.getConnection();
             String query = "SELECT * FROM users WHERE username LIKE ?";
             PreparedStatement St = Con.prepareStatement(query);
-            St.setString(1,"%"+ searchQuerry +"%");
+            St.setString(1, "%" + searchQuerry + "%");
             Rs = St.executeQuery();
             StaffTable1.setModel(DbUtils.resultSetToTableModel(Rs));
             StaffTable1.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, 
-                    boolean isSelected, boolean hasFocus, int row, int column) {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value,
+                        boolean isSelected, boolean hasFocus, int row, int column) {
 
-                // Chuyển nội dung hiển thị thành dấu *
-                if (value != null) {
-                    value = "********"; 
-                    // Hoặc: value = "•".repeat(value.toString().length()); (Java 11+)
-                }
+                    // Chuyển nội dung hiển thị thành dấu *
+                    if (value != null) {
+                        value = "********";
+                        // Hoặc: value = "•".repeat(value.toString().length()); (Java 11+)
+                    }
 
-                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 }
             });
-        }
-        catch (Exception e) {
-            System.out.println("co loi"+e);
-        }
-        finally{
+        } catch (Exception e) {
+            System.out.println("co loi" + e);
+        } finally {
             deleteSearchBtn.setVisible(true);
         }
     }//GEN-LAST:event_searchBtnMouseClicked
