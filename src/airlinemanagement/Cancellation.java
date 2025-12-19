@@ -4,12 +4,21 @@
  */
 package airlinemanagement;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import net.proteanit.sql.DbUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -25,7 +34,7 @@ public class Cancellation extends javax.swing.JFrame {
         GetTickets();
         DisplayCanc();
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -45,6 +54,10 @@ public class Cancellation extends javax.swing.JFrame {
         CancleBtn = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         CDate = new com.toedter.calendar.JDateChooser();
+        SearchTb = new javax.swing.JTextField();
+        Search = new javax.swing.JButton();
+        Reset = new javax.swing.JButton();
+        Export = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -80,7 +93,7 @@ public class Cancellation extends javax.swing.JFrame {
 
         ResetBtn.setFont(new java.awt.Font("VNI-Book", 1, 14)); // NOI18N
         ResetBtn.setForeground(new java.awt.Color(204, 0, 51));
-        ResetBtn.setText("Reset");
+        ResetBtn.setText("Reset Cancel");
         ResetBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 ResetBtnMouseClicked(evt);
@@ -151,18 +164,64 @@ public class Cancellation extends javax.swing.JFrame {
         jLabel7.setForeground(new java.awt.Color(204, 0, 0));
         jLabel7.setText("Cancel Date");
 
+        SearchTb.setActionCommand("<Not Set>");
+        SearchTb.setAutoscrolls(false);
+        SearchTb.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SearchTbActionPerformed(evt);
+            }
+        });
+
+        Search.setText("Search");
+        Search.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                SearchMouseClicked(evt);
+            }
+        });
+
+        Reset.setText("Reset");
+        Reset.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ResetMouseClicked(evt);
+            }
+        });
+
+        Export.setFont(new java.awt.Font(".VnArial", 1, 14)); // NOI18N
+        Export.setForeground(new java.awt.Color(204, 0, 51));
+        Export.setIcon(new javax.swing.ImageIcon(getClass().getResource("/picture/Excel2_35735.png"))); // NOI18N
+        Export.setText("Export");
+        Export.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ExportMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(113, 113, 113)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(TIdCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(61, 61, 61)
+                        .addComponent(CancleBtn)
+                        .addGap(211, 211, 211)
+                        .addComponent(BackBtn)
+                        .addGap(43, 43, 43)
+                        .addComponent(Export))
+                    .addComponent(jLabel11))
+                .addContainerGap(169, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel9)
+                .addGap(341, 341, 341))
+            .addGroup(layout.createSequentialGroup()
                 .addGap(25, 25, 25)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 808, Short.MAX_VALUE)
-                        .addGap(26, 26, 26))
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -171,10 +230,10 @@ public class Cancellation extends javax.swing.JFrame {
                                     .addComponent(jLabel2))
                                 .addGap(270, 270, 270))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(FCodeTb, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(jLabel4)
-                                    .addComponent(ResetBtn))
+                                    .addComponent(ResetBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(FCodeTb))
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
                                         .addGap(134, 134, 134)
@@ -183,22 +242,17 @@ public class Cancellation extends javax.swing.JFrame {
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(CDate, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(195, 195, 195))))))))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(113, 113, 113)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(TIdCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(61, 61, 61)
-                        .addComponent(CancleBtn)
-                        .addGap(209, 209, 209)
-                        .addComponent(BackBtn))
-                    .addComponent(jLabel11))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel9)
-                .addGap(341, 341, 341))
+                                        .addGap(195, 195, 195))))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(SearchTb, javax.swing.GroupLayout.PREFERRED_SIZE, 606, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Search, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Reset, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 808, Short.MAX_VALUE))
+                        .addGap(26, 26, 26))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -223,16 +277,22 @@ public class Cancellation extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(FCodeTb, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(TIdCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(ResetBtn)
                         .addComponent(CancleBtn))
-                    .addComponent(BackBtn))
+                    .addComponent(BackBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(Export, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel9)
+                .addGap(4, 4, 4)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(SearchTb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Search)
+                    .addComponent(Reset))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 391, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 2, Short.MAX_VALUE))
         );
 
         pack();
@@ -287,7 +347,7 @@ private void Cancel() {
                 JOptionPane.showMessageDialog(this, e);
             }
 }
-private void DisplayCanc(){
+    private void DisplayCanc(){
         try {
             Con = DBConnection.getConnection();
             St = Con.createStatement();
@@ -300,6 +360,74 @@ private void DisplayCanc(){
         FCodeTb.setText("");
     }
     
+    private void Search() {
+    if (SearchTb.getText().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Enter Flight Code to search");
+        return;
+    }
+    try {
+        Con = DBConnection.getConnection();
+        String query = "SELECT * FROM Cancellationtbl WHERE FLCode LIKE ?";
+        PreparedStatement pst = Con.prepareStatement(query);
+        pst.setString(1, "%" + SearchTb.getText() + "%");
+        Rs = pst.executeQuery();
+        CancellationTable.setModel(DbUtils.resultSetToTableModel(Rs));
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, e);
+    }
+}
+    
+    private void ExportToExcel() {
+    try {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save Excel File");
+        fileChooser.setSelectedFile(new File("Cancellation.xlsx"));
+
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File fileToSave = fileChooser.getSelectedFile();
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Cancellation");
+
+        DefaultTableModel model = (DefaultTableModel) CancellationTable.getModel();
+
+        // Header
+        Row headerRow = sheet.createRow(0);
+        for (int col = 0; col < model.getColumnCount(); col++) {
+            Cell cell = headerRow.createCell(col);
+            cell.setCellValue(model.getColumnName(col));
+        }
+
+        // Data
+        for (int row = 0; row < model.getRowCount(); row++) {
+            Row excelRow = sheet.createRow(row + 1);
+            for (int col = 0; col < model.getColumnCount(); col++) {
+                Cell cell = excelRow.createCell(col);
+                Object value = model.getValueAt(row, col);
+                cell.setCellValue(value == null ? "" : value.toString());
+            }
+        }
+
+        // Auto size columns
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        FileOutputStream fos = new FileOutputStream(fileToSave);
+        workbook.write(fos);
+        fos.close();
+        workbook.close();
+
+        JOptionPane.showMessageDialog(this, "Export Excel Successfully!");
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, e);
+    }
+}
     private void FCodeTbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FCodeTbActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_FCodeTbActionPerformed
@@ -351,6 +479,27 @@ private void DisplayCanc(){
         }
     }//GEN-LAST:event_CancleBtnMouseClicked
 
+    private void SearchTbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchTbActionPerformed
+        // TODO add your handling code here:
+        Search();
+    }//GEN-LAST:event_SearchTbActionPerformed
+
+    private void SearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SearchMouseClicked
+        // TODO add your handling code here:
+        Search();
+    }//GEN-LAST:event_SearchMouseClicked
+
+    private void ResetMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ResetMouseClicked
+        // TODO add your handling code here:
+        SearchTb.setText("");
+        DisplayCanc();
+    }//GEN-LAST:event_ResetMouseClicked
+
+    private void ExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ExportMouseClicked
+        // TODO add your handling code here:
+        ExportToExcel();
+    }//GEN-LAST:event_ExportMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -391,8 +540,12 @@ private void DisplayCanc(){
     private com.toedter.calendar.JDateChooser CDate;
     private javax.swing.JTable CancellationTable;
     private javax.swing.JButton CancleBtn;
+    private javax.swing.JButton Export;
     private javax.swing.JTextField FCodeTb;
+    private javax.swing.JButton Reset;
     private javax.swing.JButton ResetBtn;
+    private javax.swing.JButton Search;
+    private javax.swing.JTextField SearchTb;
     private javax.swing.JComboBox<String> TIdCb;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
