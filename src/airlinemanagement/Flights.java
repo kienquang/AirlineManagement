@@ -13,6 +13,27 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import net.proteanit.sql.DbUtils;
 import com.toedter.calendar.JDateChooser;
+import java.awt.Image;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.io.FileOutputStream;
+import java.net.URL;
+import javax.swing.ImageIcon;
+
+// Swing + File
+import javax.swing.JFileChooser;
+import java.io.File;
+import java.io.FileOutputStream;
+
+// JTable
+import javax.swing.table.DefaultTableModel;
+
+// Apache POI (Excel)
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -48,16 +69,88 @@ public class Flights extends javax.swing.JFrame {
         } catch (Exception e) {
         }
     }
-
+    
+private void SearchFlight() {
+    if (SearchTb.getText().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Enter Flight Code to search");
+        return;
+    }
+    try {
+        Con = DBConnection.getConnection();
+        String query = "SELECT * FROM FlightTbl WHERE FlCode LIKE ?";
+        PreparedStatement pst = Con.prepareStatement(query);
+        pst.setString(1, "%" + SearchTb.getText() + "%");
+        Rs = pst.executeQuery();
+        FlightsTable.setModel(DbUtils.resultSetToTableModel(Rs));
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, e);
+    }
+}
 
 private void Clear()
 {
     FCodeTb.setText("");
     SeatsTb.setText("");
+    FareTb.setText("");
 }
+
+private void ExportToExcel() {
+    try {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save Excel File");
+        fileChooser.setSelectedFile(new File("Flights.xlsx"));
+
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File fileToSave = fileChooser.getSelectedFile();
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Flights");
+
+        DefaultTableModel model = (DefaultTableModel) FlightsTable.getModel();
+
+        // Header
+        Row headerRow = sheet.createRow(0);
+        for (int col = 0; col < model.getColumnCount(); col++) {
+            Cell cell = headerRow.createCell(col);
+            cell.setCellValue(model.getColumnName(col));
+        }
+
+        // Data
+        for (int row = 0; row < model.getRowCount(); row++) {
+            Row excelRow = sheet.createRow(row + 1);
+            for (int col = 0; col < model.getColumnCount(); col++) {
+                Cell cell = excelRow.createCell(col);
+                Object value = model.getValueAt(row, col);
+                cell.setCellValue(value == null ? "" : value.toString());
+            }
+        }
+
+        // Auto size columns
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        FileOutputStream fos = new FileOutputStream(fileToSave);
+        workbook.write(fos);
+        fos.close();
+        workbook.close();
+
+        JOptionPane.showMessageDialog(this, "Export Excel Successfully!");
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, e);
+    }
+}
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        jFormattedTextField2 = new javax.swing.JFormattedTextField();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -79,6 +172,16 @@ private void Clear()
         jScrollPane1 = new javax.swing.JScrollPane();
         FlightsTable = new javax.swing.JTable();
         FDate = new com.toedter.calendar.JDateChooser();
+        SearchTb = new javax.swing.JTextField();
+        Search = new javax.swing.JButton();
+        Reset = new javax.swing.JButton();
+        Export = new javax.swing.JButton();
+        FareTb = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+
+        jFormattedTextField1.setText("jFormattedTextField1");
+
+        jFormattedTextField2.setText("jFormattedTextField2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -228,6 +331,55 @@ private void Clear()
         });
         jScrollPane1.setViewportView(FlightsTable);
 
+        SearchTb.setToolTipText("");
+        SearchTb.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SearchTbActionPerformed(evt);
+            }
+        });
+
+        Search.setText("Search");
+        Search.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                SearchMouseClicked(evt);
+            }
+        });
+
+        Reset.setText("Reset");
+        Reset.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ResetMouseClicked(evt);
+            }
+        });
+        Reset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ResetActionPerformed(evt);
+            }
+        });
+
+        Export.setFont(new java.awt.Font(".VnArial", 1, 14)); // NOI18N
+        Export.setForeground(new java.awt.Color(204, 0, 51));
+        Export.setIcon(new javax.swing.ImageIcon(getClass().getResource("/picture/Excel2_35735.png"))); // NOI18N
+        Export.setText("Export ");
+        Export.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ExportMouseClicked(evt);
+            }
+        });
+        Export.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ExportActionPerformed(evt);
+            }
+        });
+
+        FareTb.setFont(new java.awt.Font(".VnArial", 1, 14)); // NOI18N
+        FareTb.setForeground(new java.awt.Color(204, 51, 0));
+
+        jLabel1.setFont(new java.awt.Font(".VnArial", 1, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(204, 51, 0));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Fare (vnd)");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -236,22 +388,21 @@ private void Clear()
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(265, 265, 265)
-                        .addComponent(jLabel9))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(113, 113, 113)
+                        .addGap(49, 49, 49)
                         .addComponent(SaveBtn)
-                        .addGap(43, 43, 43)
-                        .addComponent(EditBtn)
-                        .addGap(42, 42, 42)
-                        .addComponent(DeleteBtn)
-                        .addGap(33, 33, 33)
-                        .addComponent(BackBtn)))
+                        .addGap(35, 35, 35)
+                        .addComponent(EditBtn))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(265, 265, 265)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel9)
+                            .addComponent(FDestCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(25, 25, 25)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
@@ -260,34 +411,50 @@ private void Clear()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(FSourceCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel5))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(17, 17, 17)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel8)
-                                            .addComponent(FDestCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addGap(32, 32, 32)
+                                .addGap(69, 69, 69)
+                                .addComponent(jLabel2))
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addGap(86, 86, 86)
+                                    .addComponent(jLabel3)
+                                    .addGap(0, 0, Short.MAX_VALUE))
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                 .addComponent(jLabel7)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(FDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel6)
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addGap(6, 6, 6)
-                                                .addComponent(SeatsTb, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel3)
-                                        .addGap(0, 0, Short.MAX_VALUE)))))))
-                .addGap(26, 26, 26))
+                                                .addComponent(FDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addGap(18, 18, 18)
+                                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(jLabel6)
+                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                                    .addComponent(SeatsTb, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addGap(26, 26, 26))))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                                    .addGap(194, 194, 194)
+                                                    .addComponent(BackBtn))
+                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                                    .addGap(86, 86, 86)
+                                                    .addComponent(DeleteBtn)))
+                                            .addGap(0, 112, Short.MAX_VALUE)))
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(Export)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(FareTb, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGap(12, 12, 12)))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(SearchTb, javax.swing.GroupLayout.PREFERRED_SIZE, 438, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Search)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Reset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(17, 17, 17))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -298,37 +465,43 @@ private void Clear()
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel8))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(FDestCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(FSourceCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(FCodeTb, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(7, 7, 7)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(FDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(SeatsTb, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel4)
+                        .addComponent(jLabel5))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel8)
+                        .addComponent(jLabel7)
+                        .addComponent(jLabel6)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(FCodeTb, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(FDate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(SeatsTb, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(FSourceCb, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(FDestCb, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addComponent(FareTb, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(EditBtn)
-                        .addComponent(SaveBtn))
+                        .addComponent(SaveBtn)
+                        .addComponent(EditBtn))
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(DeleteBtn)
-                        .addComponent(BackBtn)))
+                        .addComponent(BackBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(Export, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 391, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 36, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(SearchTb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Search)
+                    .addComponent(Reset))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 399, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -367,19 +540,20 @@ private void Clear()
     }//GEN-LAST:event_BackBtnMouseClicked
 
     private void SaveBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SaveBtnMouseClicked
-        if(FCodeTb.getText().isEmpty() || SeatsTb.getText().isEmpty() || FSourceCb.getSelectedIndex()== -1 || FDestCb.getSelectedIndex()== -1)
+        if(FCodeTb.getText().isEmpty() || SeatsTb.getText().isEmpty() || FSourceCb.getSelectedIndex()== -1 || FDestCb.getSelectedIndex()== -1 || FareTb.getText().isEmpty())
         {
             JOptionPane.showMessageDialog(this, "Missing Information");
         }else
         {
             try {
                 Con = DBConnection.getConnection();
-                PreparedStatement Add = Con.prepareStatement("insert into FlightTbl values (?,?,?,?,?)");
+                PreparedStatement Add = Con.prepareStatement("insert into FlightTbl values (?,?,?,?,?,?)");
                 Add.setString(1, FCodeTb.getText());
                 Add.setString(2, FSourceCb.getSelectedItem().toString());
                 Add.setString(3, FDestCb.getSelectedItem().toString());
                 Add.setString(4, FDate.getDate().toString());
                 Add.setInt(5, Integer.parseInt(SeatsTb.getText()));
+                Add.setInt(6, Integer.parseInt(FareTb.getText()));
                 int row = Add.executeUpdate();
                 JOptionPane.showMessageDialog(this, "Flight Added");
                 Con.close();
@@ -416,27 +590,32 @@ private void Clear()
         DefaultTableModel model = (DefaultTableModel)FlightsTable.getModel();
         int MyIndex = FlightsTable.getSelectedRow();
         Key = model.getValueAt(MyIndex, 0).toString();
+        FCodeTb.setText(model.getValueAt(MyIndex, 0).toString());
         FSourceCb.setSelectedItem(model.getValueAt(MyIndex, 1).toString());
         FDestCb.setSelectedItem(model.getValueAt(MyIndex, 2).toString());
         SeatsTb.setText(model.getValueAt(MyIndex, 4).toString());
+        FareTb.setText(model.getValueAt(MyIndex, 5).toString());
     }//GEN-LAST:event_FlightsTableMouseClicked
 
     private void EditBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditBtnMouseClicked
         if(Key == "")
         {
-            JOptionPane.showMessageDialog(this, "Select a Passenger");
+            JOptionPane.showMessageDialog(this, "Select a Flight");
         }else
         {
             try {
                 //CountPassengers();
                 Con = DBConnection.getConnection();
-                String Query = "Update FlightTbl set FlSource=?, FlDest=?, FlDate=?, FlSeats=? where FlCode=?";
+                String Query = "Update FlightTbl set FlSource=?, FlDest=?, FlDate=?, FlSeats=?, Fare=? where FlCode=?";
                 PreparedStatement Add = Con.prepareStatement(Query);
-                Add.setString(5, Key);
+                
                 Add.setString(1, FSourceCb.getSelectedItem().toString());
                 Add.setString(2, FDestCb.getSelectedItem().toString());
                 Add.setString(3, FDate.getDate().toString());
                 Add.setString(4, SeatsTb.getText());
+                Add.setString(5, FareTb.getText());
+                Add.setString(6, Key);
+                System.out.println("Da update flight code "+Key);
                 int row = Add.executeUpdate();
                 JOptionPane.showMessageDialog(this, "Flight Updated");
                 Con.close();
@@ -452,6 +631,35 @@ private void Clear()
     private void DeleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteBtnActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_DeleteBtnActionPerformed
+
+    private void SearchTbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchTbActionPerformed
+        // TODO add your handling code here:
+        SearchFlight();
+    }//GEN-LAST:event_SearchTbActionPerformed
+
+    private void SearchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SearchMouseClicked
+        // TODO add your handling code here:
+        SearchFlight();
+    }//GEN-LAST:event_SearchMouseClicked
+
+    private void ResetMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ResetMouseClicked
+        // TODO add your handling code here:
+        SearchTb.setText("");
+        DisplayFlight();
+    }//GEN-LAST:event_ResetMouseClicked
+
+    private void ResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ResetActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ResetActionPerformed
+
+    private void ExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExportActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ExportActionPerformed
+
+    private void ExportMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ExportMouseClicked
+        // TODO add your handling code here:
+        ExportToExcel();
+    }//GEN-LAST:event_ExportMouseClicked
 
     /**
      * @param args the command line arguments
@@ -492,13 +700,21 @@ private void Clear()
     private javax.swing.JButton BackBtn;
     private javax.swing.JButton DeleteBtn;
     private javax.swing.JButton EditBtn;
+    private javax.swing.JButton Export;
     private javax.swing.JTextField FCodeTb;
     private com.toedter.calendar.JDateChooser FDate;
     private javax.swing.JComboBox<String> FDestCb;
     private javax.swing.JComboBox<String> FSourceCb;
+    private javax.swing.JTextField FareTb;
     private javax.swing.JTable FlightsTable;
+    private javax.swing.JButton Reset;
     private javax.swing.JButton SaveBtn;
+    private javax.swing.JButton Search;
+    private javax.swing.JTextField SearchTb;
     private javax.swing.JTextField SeatsTb;
+    private javax.swing.JFormattedTextField jFormattedTextField1;
+    private javax.swing.JFormattedTextField jFormattedTextField2;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

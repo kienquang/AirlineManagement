@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # NetBeans
 /build/
 /dist/
@@ -11,3 +12,6 @@ nbproject/genfiles.properties
 # OS
 .DS_Store
 Thumbs.db
+=======
+/dist/
+>>>>>>> Long

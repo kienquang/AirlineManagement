@@ -105,8 +105,6 @@ public class MainForm extends javax.swing.JFrame {
         jLabel3.setForeground(new java.awt.Color(204, 0, 51));
         jLabel3.setText("Professionalisme and Quality of Service");
 
-        jLabel1.setText("Thêm ảnh vào đây");
-
         jButton1.setFont(new java.awt.Font("VNI-Book", 1, 14)); // NOI18N
         jButton1.setForeground(new java.awt.Color(204, 0, 51));
         jButton1.setText("Flights");
@@ -348,6 +346,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton staffBtn;

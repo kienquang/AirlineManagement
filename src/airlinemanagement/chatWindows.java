@@ -35,7 +35,7 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
         boolean isAdmin = userSesion.getInstance().getUser().getRole() == 1;
         txtSearch.setVisible(isAdmin);
         jButton2.setVisible(isAdmin);
-
+        ChatTextArea.setEditable(false);
 
 // Đưa List vào ScrollPane và Popup
         javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(listResults);

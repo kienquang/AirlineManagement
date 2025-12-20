@@ -220,6 +220,7 @@ public class Login extends javax.swing.JFrame {
             user.setRole(role);
             userSesion.getInstance().setUser(user);
             new MainForm().setVisible(true);
+            initSocket();
             socketClient.send("LOGIN:" + username);
             this.dispose();
         } else {
@@ -262,11 +263,7 @@ public class Login extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        try {
-                initSocket();
-                } catch (Exception ex) {
-                    Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
