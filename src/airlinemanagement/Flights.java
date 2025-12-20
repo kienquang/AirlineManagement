@@ -303,6 +303,11 @@ private void ExportToExcel() {
                 EditBtnMouseClicked(evt);
             }
         });
+        EditBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EditBtnActionPerformed(evt);
+            }
+        });
 
         BackBtn.setFont(new java.awt.Font("VNI-Book", 1, 14)); // NOI18N
         BackBtn.setForeground(new java.awt.Color(204, 0, 51));
@@ -479,9 +484,8 @@ private void ExportToExcel() {
                     .addComponent(FCodeTb, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(FDate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(SeatsTb, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(FSourceCb, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(FDestCb, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addComponent(FSourceCb, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(FDestCb, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(FareTb, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -607,7 +611,7 @@ private void ExportToExcel() {
                 Con = DBConnection.getConnection();
                 String Query = "Update FlightTbl set FlSource=?, FlDest=?, FlDate=?, FlSeats=?, Fare=? where FlCode=?";
                 PreparedStatement Add = Con.prepareStatement(Query);
-                Add.setString(5, Key);
+                Add.setString(6, Key);
                 Add.setString(1, FSourceCb.getSelectedItem().toString());
                 Add.setString(2, FDestCb.getSelectedItem().toString());
                 Add.setString(3, FDate.getDate().toString());
@@ -657,6 +661,10 @@ private void ExportToExcel() {
         // TODO add your handling code here:
         ExportToExcel();
     }//GEN-LAST:event_ExportMouseClicked
+
+    private void EditBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_EditBtnActionPerformed
 
     /**
      * @param args the command line arguments
