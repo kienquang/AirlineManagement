@@ -1,6 +1,13 @@
+# NetBeans
 /build/
 /dist/
 /nbproject/private/
 /nbproject/build-impl.xml
 nbproject/genfiles.properties
+
+# Java
 *.class
+
+# OS
+.DS_Store
+Thumbs.db
