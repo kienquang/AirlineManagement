@@ -15,6 +15,7 @@ public class Splash extends javax.swing.JFrame {
      */
     public Splash() {
         initComponents();
+        startLoading();
     }
 
     /**
@@ -93,34 +94,48 @@ public class Splash extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-
-    try {
-        for (javax.swing.UIManager.LookAndFeelInfo info :
-                javax.swing.UIManager.getInstalledLookAndFeels()) {
-            if ("Nimbus".equals(info.getName())) {
-                javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                break;
-            }
-        }
-    } catch (Exception e) {}
-
-    Splash splash = new Splash();
-    splash.setVisible(true);
-
+    private void startLoading() {
     javax.swing.Timer timer = new javax.swing.Timer(50, null);
     timer.addActionListener(e -> {
-        int value = splash.MyprogressBar.getValue();
+        int value = MyprogressBar.getValue();
         if (value < 100) {
-            splash.MyprogressBar.setValue(value + 1);
+            MyprogressBar.setValue(value + 1);
         } else {
             timer.stop();
             new Login().setVisible(true);
-            splash.dispose();
+            dispose();
         }
     });
     timer.start();
-}
+    }
+//    public static void main(String args[]) {
+//
+//    try {
+//        for (javax.swing.UIManager.LookAndFeelInfo info :
+//                javax.swing.UIManager.getInstalledLookAndFeels()) {
+//            if ("Nimbus".equals(info.getName())) {
+//                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                break;
+//            }
+//        }
+//    } catch (Exception e) {}
+//
+//    Splash splash = new Splash();
+//    splash.setVisible(true);
+//
+//    javax.swing.Timer timer = new javax.swing.Timer(50, null);
+//    timer.addActionListener(e -> {
+//        int value = splash.MyprogressBar.getValue();
+//        if (value < 100) {
+//            splash.MyprogressBar.setValue(value + 1);
+//        } else {
+//            timer.stop();
+//            new Login().setVisible(true);
+//            splash.dispose();
+//        }
+//    });
+//    timer.start();
+//}
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

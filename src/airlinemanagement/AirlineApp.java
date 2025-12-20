@@ -10,6 +10,8 @@ package airlinemanagement;
  */
 public class AirlineApp {
     public static void main(String[] args) {
-        
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            new Splash().setVisible(true);
+        });
     }
 }
