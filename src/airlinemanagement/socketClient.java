@@ -16,7 +16,8 @@ public class socketClient {
     private static ServerListener listener;
 
     public static void connect() throws Exception {
-        Socket socket = new Socket("0.tcp.ap.ngrok.io", 14367);
+        //Socket socket = new Socket("0.tcp.ap.ngrok.io", 14014);
+        Socket socket = new Socket("localhost", 1234);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream(), true);
         startListening();
