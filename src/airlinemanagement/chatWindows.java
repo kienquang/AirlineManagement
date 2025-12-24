@@ -5,6 +5,7 @@
 package airlinemanagement;
 
 import java.sql.*;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -16,10 +17,11 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
      * Creates new form chatWindows2
      */
     private String curentReciver = "";
+    private int  currentReciverRole = -1;
     private Connection conn = null;
     private javax.swing.JPopupMenu searchPopup;
-    private javax.swing.JList<String> listResults;
-    private javax.swing.DefaultListModel<String> listModel;
+    private javax.swing.JList<userChat> listResults;
+    private javax.swing.DefaultListModel<userChat> listModel;
 
     public chatWindows() {
         initComponents();
@@ -30,11 +32,11 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
                 )
         );
         // Khởi tạo List và Model
-        listModel = new javax.swing.DefaultListModel<>();
-        listResults = new javax.swing.JList<>(listModel);
-        boolean isAdmin = userSesion.getInstance().getUser().getRole() == 1;
-        txtSearch.setVisible(isAdmin);
-        jButton2.setVisible(isAdmin);
+        listModel = new javax.swing.DefaultListModel<userChat>();
+        listResults = new javax.swing.JList<userChat>(listModel);
+        //boolean isAdmin = userSesion.getInstance().getUser().getRole() == 1;
+        //txtSearch.setVisible(isAdmin);
+        //jButton2.setVisible(isAdmin);
         ChatTextArea.setEditable(false);
 
 // Đưa List vào ScrollPane và Popup
@@ -48,9 +50,10 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
 // Sự kiện khi click chọn 1 người từ danh sách kết quả
         listResults.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                String selected = listResults.getSelectedValue();
+                userChat selected = listResults.getSelectedValue();
                 if (selected != null) {
-                    curentReciver = selected; // Gán người nhận
+                    curentReciver = selected.getUsername(); // Gán người nhận
+                    currentReciverRole = selected.getIsAdmin();
                     txtSearch.setText("");    // Xóa ô tìm kiếm
                     searchPopup.setVisible(false);
                     socketClient.send("LOAD_CHAT:" + curentReciver);
@@ -68,7 +71,7 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
         try {
             String myName = userSesion.getInstance().getUser().getUserName();
             // Truy vấn tìm các user khác có tên giống từ khóa
-            String sql = "SELECT username FROM users WHERE username LIKE ? AND username != ?";
+            String sql = "SELECT username, isAdmin FROM users WHERE username LIKE ? AND username != ?";
             conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, "%" + keyword + "%");
@@ -76,7 +79,10 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                listModel.addElement(rs.getString("username"));
+                userChat u = new userChat();
+                u.setUsername(rs.getString("username"));
+                u.setIsAdmin(rs.getInt("isAdmin"));
+                listModel.addElement(u);
             }
 
             if (!listModel.isEmpty()) {
@@ -91,7 +97,7 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
         }
     }
 
-    private void updateConversationUI(String username, String message) {
+    private void updateConversationUI(String username, String message, int role) {
         javax.swing.SwingUtilities.invokeLater(() -> {
 
             ChatItem found = null;
@@ -115,6 +121,7 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
                     @Override
                     public void mouseClicked(java.awt.event.MouseEvent evt) {
                         curentReciver = username;
+                        currentReciverRole = role;
                         System.out.println("Dang chat voi " + curentReciver);
                         ChatTextField.setText("");
                         ChatTextArea.setText("");
@@ -153,9 +160,16 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
         System.out.println("DEBUG SENDER GỬI ĐI: [" + sender + "]"); // Ki
         if (sender != null) {
             if (senderRole != 1) {
-                socketClient.send("CHAT:" + sender + ":admin2:" + content);
-            } else {
-                socketClient.send("CHAT:" + sender + ":" + curentReciver + ":" + content);
+                if(currentReciverRole != 1){
+                    JOptionPane.showMessageDialog(null, "Bạn chỉ có thể gửi tin nhắn tới tài khoản có vai trò admin");
+                    return;
+                }
+                else {
+                socketClient.send("CHAT:" + sender + ":" + curentReciver + ":" + content + ":" + senderRole);
+                }
+            } else
+            {
+                socketClient.send("CHAT:" + sender + ":" + curentReciver + ":" + content + ":" + senderRole);
             }
         } else {
             System.out.println("loi roi ");
@@ -172,12 +186,12 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
         System.out.println("Nhan: " + trimmed);
 
         if (trimmed.startsWith("MSG:")) {
-            String[] p = trimmed.split(":", 4);
-            if (p.length == 4) {
+            String[] p = trimmed.split(":", 5);
+            if (p.length == 5) {
                 String sender = p[1];
                 String receiver = p[2];
                 String content = p[3];
-
+                System.out.println("noi dung tin nhan "+content);
                 // Chỉ hiển thị nếu đúng cuộc chat đang mở
                 if (sender.equals(curentReciver) || receiver.equals(curentReciver)) {
                     javax.swing.SwingUtilities.invokeLater(() -> {
@@ -199,9 +213,13 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
         }
 
         if (trimmed.startsWith("UPDATE_LIST:")) {
-            String[] p = trimmed.split(":", 3);
-            if (p.length == 3) {
-                updateConversationUI(p[1], p[2]);
+            String[] p = trimmed.split(":", 4);
+            if (p.length == 4) {
+                String name = p[1];
+                String lastMsg = p[2];
+                int role = Integer.parseInt(p[3]);
+                System.out.println("Ben client "+name+" : "+lastMsg+" : "+role);
+                updateConversationUI(name, lastMsg, role);
             }
         }
     }
