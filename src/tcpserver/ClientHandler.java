@@ -24,6 +24,8 @@ public class ClientHandler extends Thread {
     BufferedReader in;
     PrintWriter out;
     String username;
+    String oldReciver = "";
+    int reciverRole = -1;
     Connection conn = null;
 
     public ClientHandler(Socket socket) throws Exception {
@@ -54,26 +56,30 @@ public class ClientHandler extends Thread {
                 if (line.startsWith("CHAT:")) {
                     System.out.println("message vua gui " + line);
                     // CHAT:Nam:Hello
-                    String[] p = line.split(":", 4);
-                    if (p.length < 4) {
+                    String[] p = line.split(":", 5);
+                    if (p.length < 5) {
                         return;
                     }
                     String sender = p[1];
                     String receiver = p[2];
                     String content = p[3];
-
+                    int senderRole = Integer.parseInt(p[4]);
+                    if(oldReciver != receiver){
+                        reciverRole = getUserRole(receiver);
+                        oldReciver = receiver;
+                    }
                     int convId = getOrCreateConversation(sender, receiver);
                     saveMessage(convId, sender, content);
 
                     ClientHandler target = ChatServer.onlineUsers.get(receiver);
                     if (target != null) {
-                        target.out.println("MSG:" + sender + ":" + receiver + ":" + content);
-                        target.out.println("UPDATE_LIST:" + sender + ":" + content);
+                        target.out.println("MSG:" + sender + ":" + receiver + ":" + content + ":" + senderRole);
+                        target.out.println("UPDATE_LIST:" + sender + ":" + content + ":" + senderRole);
                     } else {
                         System.out.println("Người nhận " + receiver + " không online");
                     }
-                    this.out.println("UPDATE_LIST:" + receiver + ":" + content);
-                    this.out.println("MSG:" + sender + ":" + receiver + ":" + content);
+                    this.out.println("UPDATE_LIST:" + receiver + ":" + content + ":" + reciverRole);
+                    this.out.println("MSG:" + sender + ":" + receiver + ":" + content + ":" + reciverRole);
                     //this.out.flush();
                 }
             }
@@ -116,7 +122,7 @@ public class ClientHandler extends Thread {
         int myId = getUserId(username);
 
         // Lấy tất cả hội thoại mà tôi tham gia, kèm theo tên của đối phương
-        String query = "SELECT c.id, c.last_message, u.username "
+        String query = "SELECT c.id, c.last_message, u.username, u.isAdmin "
                 + "FROM conversations c "
                 + "JOIN users u ON (u.id = c.user1_id OR u.id = c.user2_id) "
                 + "WHERE (c.user1_id = ? OR c.user2_id = ?) AND u.id != ?";
@@ -130,12 +136,14 @@ public class ClientHandler extends Thread {
         while (rs.next()) {
             String partnerName = rs.getString("username");
             String lastMsg = rs.getString("last_message");
+            int partnerRole = rs.getInt("isAdmin");
             if (lastMsg == null) {
                 lastMsg = "";
             }
 
             // Gửi về Client để vẽ lên panelConversation
-            out.println("UPDATE_LIST:" + partnerName + ":" + lastMsg);
+            out.println("UPDATE_LIST:" + partnerName + ":" + lastMsg + ":" + partnerRole);
+            System.out.println("ben server "+"UPDATE_LIST:" + partnerName + ":" + lastMsg + ":" + partnerRole);
         }
     }
 
@@ -150,7 +158,17 @@ public class ClientHandler extends Thread {
         }
         throw new RuntimeException("User not found");
     }
-
+    int getUserRole(String name) throws Exception {
+        PreparedStatement ps = conn.prepareStatement(
+                "SELECT isAdmin FROM users WHERE username=?"
+        );
+        ps.setString(1, name);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+        throw new RuntimeException("User not found");
+    }
     int getOrCreateConversation(String u1, String u2) throws Exception {
         int id1 = getUserId(u1);
         int id2 = getUserId(u2);
