@@ -3,15 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package airlinemanagement;
-
+import  java.net.*;
+import  java.io.*;
 /**
  *
  * @author ADMIN88
  */
-public class AirlineApp {
-    public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            new Splash().setVisible(true);
-        });
-    }
+public class ChatClient {
+    
 }

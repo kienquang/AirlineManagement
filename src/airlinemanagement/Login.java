@@ -5,12 +5,22 @@
 package airlinemanagement;
 
 import javax.swing.JOptionPane;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import  java.net.*;
+import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Q.Kiên
  */
 public class Login extends javax.swing.JFrame {
+    static  void initSocket() throws Exception {
+        socketClient.connect();
+    }
 
     /**
      * Creates new form Login
@@ -18,6 +28,7 @@ public class Login extends javax.swing.JFrame {
     public Login() {
         initComponents();
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -182,17 +193,48 @@ public class Login extends javax.swing.JFrame {
 
     private void LoginBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LoginBtnMouseClicked
         // TODO add your handling code here:
-        if(UnameTb.getText().isEmpty()|| passwordTb.getText().isEmpty())
-        {
-            JOptionPane.showMessageDialog(this, "Nhập tài khoản và mật khẩu");
-        } 
-        else if (UnameTb.getText().equals("Admin") && passwordTb.getText().equals("12345678")){
+    String username = UnameTb.getText();
+    String password = passwordTb.getText();
+
+    if (username.isEmpty() || password.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Nhập tài khoản và mật khẩu");
+        return;
+    }
+
+    try {
+        Connection con = DBConnection.getConnection();
+
+        String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+        PreparedStatement pst = con.prepareStatement(sql);
+
+        pst.setString(1, username);
+        pst.setString(2, password);
+
+        ResultSet rs = pst.executeQuery();
+
+        if (rs.next()) {
+            String userName = rs.getString("username");
+            int role = rs.getInt("isAdmin");
+            currentUser user = new  currentUser();
+            user.setUserName(userName);
+            user.setRole(role);
+            userSesion.getInstance().setUser(user);
             new MainForm().setVisible(true);
+            initSocket();
+            socketClient.send("LOGIN:" + username);
             this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Sai tài khoản hoặc mật khẩu");
         }
-        else{
-            JOptionPane.showMessageDialog(this, "Sai taif khoản hoặc mật khẩu");
-        }
+
+        rs.close();
+        pst.close();
+        con.close();
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Lỗi kết nối database");
+        e.printStackTrace();
+    }
     }//GEN-LAST:event_LoginBtnMouseClicked
 
     /**
@@ -221,7 +263,7 @@ public class Login extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
