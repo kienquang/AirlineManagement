@@ -281,6 +281,8 @@ public class MainForm extends javax.swing.JFrame {
 
     private void jButton5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton5MouseClicked
         // TODO add your handling code here:
+        String userName = userSesion.getInstance().getUser().getUserName();
+        socketClient.send("LOGOUT:"+userName);
         userSesion.getInstance().setUser(null);
         this.dispose();
         new Login().setVisible(true);

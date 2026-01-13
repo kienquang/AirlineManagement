@@ -53,10 +53,10 @@
                               <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
                               <Component id="UnameTb" min="-2" pref="71" max="-2" attributes="0"/>
-                              <Component id="passwordTb" min="-2" max="-2" attributes="0"/>
-                              <Component id="LoginBtn" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="LoginBtn" alignment="0" max="32767" attributes="0"/>
+                              <Component id="passwordTb" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
@@ -206,9 +206,6 @@
           </Events>
         </Component>
         <Component class="javax.swing.JPasswordField" name="passwordTb">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="jPasswordField1"/>
-          </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="passwordTbActionPerformed"/>
           </Events>

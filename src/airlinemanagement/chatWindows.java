@@ -45,7 +45,7 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
 
         searchPopup = new javax.swing.JPopupMenu();
         searchPopup.add(scrollPane);
-        searchPopup.setFocusable(false); // Quan trọng để không mất focus ô nhập
+        searchPopup.setFocusable(false); 
 
 // Sự kiện khi click chọn 1 người từ danh sách kết quả
         listResults.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -183,7 +183,7 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
     public void onMessage(String msg) {
 
         String trimmed = msg.trim();
-        System.out.println("Nhan: " + trimmed);
+        //System.out.println("Nhan: " + trimmed);
 
         if (trimmed.startsWith("MSG:")) {
             String[] p = trimmed.split(":", 5);
@@ -191,7 +191,7 @@ public class chatWindows extends javax.swing.JFrame implements ServerListener {
                 String sender = p[1];
                 String receiver = p[2];
                 String content = p[3];
-                System.out.println("noi dung tin nhan "+content);
+                //System.out.println("noi dung tin nhan "+content);
                 // Chỉ hiển thị nếu đúng cuộc chat đang mở
                 if (sender.equals(curentReciver) || receiver.equals(curentReciver)) {
                     javax.swing.SwingUtilities.invokeLater(() -> {
