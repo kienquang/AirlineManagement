@@ -594,6 +594,7 @@ private void ExportToExcel() {
         DefaultTableModel model = (DefaultTableModel)FlightsTable.getModel();
         int MyIndex = FlightsTable.getSelectedRow();
         Key = model.getValueAt(MyIndex, 0).toString();
+        FCodeTb.setText(model.getValueAt(MyIndex, 0).toString());
         FSourceCb.setSelectedItem(model.getValueAt(MyIndex, 1).toString());
         FDestCb.setSelectedItem(model.getValueAt(MyIndex, 2).toString());
         SeatsTb.setText(model.getValueAt(MyIndex, 4).toString());
@@ -609,14 +610,15 @@ private void ExportToExcel() {
             try {
                 //CountPassengers();
                 Con = DBConnection.getConnection();
-                String Query = "Update FlightTbl set FlSource=?, FlDest=?, FlDate=?, FlSeats=?, Fare=? where FlCode=?";
+                String Query = "Update FlightTbl set FlCode=?, FlSource=?, FlDest=?, FlDate=?, FlSeats=?, Fare=? where FlCode=?";
                 PreparedStatement Add = Con.prepareStatement(Query);
-                Add.setString(6, Key);
-                Add.setString(1, FSourceCb.getSelectedItem().toString());
-                Add.setString(2, FDestCb.getSelectedItem().toString());
-                Add.setString(3, FDate.getDate().toString());
-                Add.setString(4, SeatsTb.getText());
-                Add.setString(5, FareTb.getText());
+                Add.setString(7, Key);
+                Add.setString(1, FCodeTb.getText());
+                Add.setString(2, FSourceCb.getSelectedItem().toString());
+                Add.setString(3, FDestCb.getSelectedItem().toString());
+                Add.setString(4, FDate.getDate().toString());
+                Add.setString(5, SeatsTb.getText());
+                Add.setString(6, FareTb.getText());
                 int row = Add.executeUpdate();
                 JOptionPane.showMessageDialog(this, "Flight Updated");
                 Con.close();
