@@ -19,6 +19,8 @@ import java.awt.event.ComponentEvent;
 import java.io.FileOutputStream;
 import java.net.URL;
 import javax.swing.ImageIcon;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 // Swing + File
 import javax.swing.JFileChooser;
@@ -247,7 +249,7 @@ private void ExportToExcel() {
 
         FSourceCb.setFont(new java.awt.Font("VNI-Book", 1, 14)); // NOI18N
         FSourceCb.setForeground(new java.awt.Color(204, 0, 0));
-        FSourceCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ha Noi", "Bangkok", "Da Nang", "TP.HCM", " " }));
+        FSourceCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ha Noi", "Bangkok", "Da Nang", "TP.HCM" }));
         FSourceCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 FSourceCbActionPerformed(evt);
@@ -256,7 +258,7 @@ private void ExportToExcel() {
 
         FDestCb.setFont(new java.awt.Font("VNI-Book", 1, 14)); // NOI18N
         FDestCb.setForeground(new java.awt.Color(204, 0, 0));
-        FDestCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ha Noi", "Bangkok", "Da Nang", "TP.HCM", " " }));
+        FDestCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ha Noi", "Bangkok", "Da Nang", "TP.HCM" }));
         FDestCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 FDestCbActionPerformed(evt);
@@ -301,6 +303,11 @@ private void ExportToExcel() {
         EditBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 EditBtnMouseClicked(evt);
+            }
+        });
+        EditBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EditBtnActionPerformed(evt);
             }
         });
 
@@ -475,14 +482,18 @@ private void ExportToExcel() {
                         .addComponent(jLabel6)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(FCodeTb, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(FDate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(SeatsTb, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(FSourceCb, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(FDestCb, javax.swing.GroupLayout.Alignment.TRAILING))
-                    .addComponent(FareTb, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(FSourceCb, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(FDestCb, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(FareTb)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(SeatsTb, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(FCodeTb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(FDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -501,7 +512,7 @@ private void ExportToExcel() {
                     .addComponent(Reset))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 399, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 0, 0))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -546,6 +557,19 @@ private void ExportToExcel() {
         }else
         {
             try {
+                LocalDate selectedDate = FDate.getDate()
+                        .toInstant() //chuyển date thành instant (thời điểm chính xác tính bàng milisecond)
+                        .atZone(ZoneId.systemDefault()) //gắn múi giờ
+                        .toLocalDate(); //lấy ngày
+
+                if (selectedDate.isBefore(LocalDate.now()) || FSourceCb.getSelectedItem().toString().equals(FDestCb.getSelectedItem().toString())) {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "Source and destination cannot be the same.\nFlight date cannot be before today."
+                    );
+                    
+                    return;
+                }
                 Con = DBConnection.getConnection();
                 PreparedStatement Add = Con.prepareStatement("insert into FlightTbl values (?,?,?,?,?,?)");
                 Add.setString(1, FCodeTb.getText());
@@ -605,17 +629,29 @@ private void ExportToExcel() {
         {
             try {
                 //CountPassengers();
+                LocalDate selectedDate = FDate.getDate()
+                        .toInstant() //chuyển date thành instant thời điểm chính xác tính bàng milisecond)
+                        .atZone(ZoneId.systemDefault()) //gắn múi giờ
+                        .toLocalDate(); //lấy ngày
+
+                if (selectedDate.isBefore(LocalDate.now()) || FSourceCb.getSelectedItem().toString().equals(FDestCb.getSelectedItem().toString())) {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "Source and destination cannot be the same.\nFlight date cannot be before today."
+                    );
+                    
+                    return;
+                }
                 Con = DBConnection.getConnection();
-                String Query = "Update FlightTbl set FlSource=?, FlDest=?, FlDate=?, FlSeats=?, Fare=? where FlCode=?";
+                String Query = "Update FlightTbl set FlCode=?, FlSource=?, FlDest=?, FlDate=?, FlSeats=?, Fare=? where FlCode=?";
                 PreparedStatement Add = Con.prepareStatement(Query);
-                
-                Add.setString(1, FSourceCb.getSelectedItem().toString());
-                Add.setString(2, FDestCb.getSelectedItem().toString());
-                Add.setString(3, FDate.getDate().toString());
-                Add.setString(4, SeatsTb.getText());
-                Add.setString(5, FareTb.getText());
-                Add.setString(6, Key);
-                System.out.println("Da update flight code "+Key);
+                Add.setString(7, Key);
+                Add.setString(1, FCodeTb.getText());
+                Add.setString(2, FSourceCb.getSelectedItem().toString());
+                Add.setString(3, FDestCb.getSelectedItem().toString());
+                Add.setString(4, FDate.getDate().toString());
+                Add.setString(5, SeatsTb.getText());
+                Add.setString(6, FareTb.getText());
                 int row = Add.executeUpdate();
                 JOptionPane.showMessageDialog(this, "Flight Updated");
                 Con.close();
@@ -660,6 +696,10 @@ private void ExportToExcel() {
         // TODO add your handling code here:
         ExportToExcel();
     }//GEN-LAST:event_ExportMouseClicked
+
+    private void EditBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_EditBtnActionPerformed
 
     /**
      * @param args the command line arguments
