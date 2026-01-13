@@ -134,9 +134,27 @@ public class TicketBooking extends javax.swing.JFrame {
 
         amountTb.setFont(new java.awt.Font("VNI-Book", 1, 18)); // NOI18N
         amountTb.setForeground(new java.awt.Color(204, 0, 51));
+        amountTb.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+                amountTbInputMethodTextChanged(evt);
+            }
+        });
         amountTb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 amountTbActionPerformed(evt);
+            }
+        });
+        amountTb.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                amountTbKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                amountTbKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                amountTbKeyTyped(evt);
             }
         });
 
@@ -159,6 +177,16 @@ public class TicketBooking extends javax.swing.JFrame {
         GenderCb.setFont(new java.awt.Font("VNI-Book", 1, 14)); // NOI18N
         GenderCb.setForeground(new java.awt.Color(204, 0, 0));
         GenderCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Male", "Female", "Others" }));
+        GenderCb.setAutoscrolls(true);
+        GenderCb.setEnabled(false);
+        GenderCb.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                GenderCbMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                GenderCbMousePressed(evt);
+            }
+        });
         GenderCb.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 GenderCbActionPerformed(evt);
@@ -282,6 +310,16 @@ public class TicketBooking extends javax.swing.JFrame {
         FareTb.setEditable(false);
         FareTb.setFont(new java.awt.Font(".VnArial", 1, 14)); // NOI18N
         FareTb.setForeground(new java.awt.Color(204, 51, 0));
+        FareTb.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                FareTbActionPerformed(evt);
+            }
+        });
+        FareTb.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                FareTbKeyTyped(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font(".VnArial", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(204, 51, 0));
@@ -305,12 +343,12 @@ public class TicketBooking extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addGap(107, 107, 107)
-                                        .addComponent(passenNameTb, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
                                         .addGap(120, 120, 120)
-                                        .addComponent(BookBtn)))
-                                .addGap(18, 18, 18)
+                                        .addComponent(BookBtn)
+                                        .addGap(112, 112, 112))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(passenNameTb, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)))
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(ResetBtn)
                                     .addComponent(FlightCodeCb, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -364,7 +402,6 @@ public class TicketBooking extends javax.swing.JFrame {
                         .addComponent(Reset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(PassenIdCb, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel11)
                                 .addGap(44, 44, 44)
@@ -372,6 +409,7 @@ public class TicketBooking extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(304, 304, 304)
                                 .addComponent(jLabel2))
+                            .addComponent(PassenIdCb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(322, 322, 322)
                                 .addComponent(jLabel3)))
@@ -460,6 +498,9 @@ private  void GetFlifhts(){
         }
 }
 private  void GetPassengerData(){
+    if (PassenIdCb.getSelectedItem() == null) {
+        return;
+    }
     String querry = "SELECT * FROM PassengersTbl WHERE PID =" + PassenIdCb.getSelectedItem().toString();
     Statement st = null;
     ResultSet Rs;
@@ -479,17 +520,31 @@ private  void GetPassengerData(){
 }
 
 private void GetFare(){
+   if (FlightCodeCb.getSelectedItem() == null) {
+        return;
+    }
+    int amount = 1;
     String querry = "SELECT Fare FROM FlightTbl WHERE FLCode ='" + FlightCodeCb.getSelectedItem().toString() + "'";
     Statement st = null;
     ResultSet Rs;
+     if (!amountTb.getText().isEmpty()) {
+        try {
+            amount = Integer.parseInt(amountTb.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Amount must be a number");
+            amountTb.setText("1");
+            return;
+        }
+    }
     try {
         Con = DBConnection.getConnection();
         st = Con.createStatement();
         Rs = st.executeQuery(querry);
         if(Rs.next()){
-            FareTb.setText(Rs.getString("Fare"));
+            FareTb.setText( String.valueOf( (Integer.parseInt( Rs.getString("Fare") )*amount) ) );
         }
     } catch (Exception e) {
+        
     }
 }
 
@@ -586,13 +641,14 @@ private void ExportToExcel() {
         Clear();
     }//GEN-LAST:event_ResetBtnMouseClicked
 private  void Clear(){
-        FlightCodeCb.setSelectedIndex(-1);
-       // PassenIdCb.setSelectedIndex(-1);
         passportNumTb.setText("");
         passenNameTb.setText("");
         GenderCb.setSelectedIndex(-1);
         NationalityTb.setText("");
         amountTb.setText("");
+        FareTb.setText("");
+        FlightCodeCb.setSelectedIndex(-1);
+        PassenIdCb.setSelectedIndex(-1);
 }
     private void GenderCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GenderCbActionPerformed
         // TODO add your handling code here:
@@ -694,7 +750,42 @@ if(passenNameTb.getText().isEmpty() || FlightCodeCb.getSelectedIndex() == -1
     private void FlightCodeCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FlightCodeCbActionPerformed
         // TODO add your handling code here:
         GetFare();
+        amountTb.setText("1");
     }//GEN-LAST:event_FlightCodeCbActionPerformed
+
+    private void FareTbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FareTbActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_FareTbActionPerformed
+
+    private void GenderCbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GenderCbMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_GenderCbMouseClicked
+
+    private void GenderCbMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GenderCbMousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_GenderCbMousePressed
+
+    private void FareTbKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_FareTbKeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_FareTbKeyTyped
+
+    private void amountTbKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_amountTbKeyTyped
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_amountTbKeyTyped
+
+    private void amountTbKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_amountTbKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_amountTbKeyPressed
+
+    private void amountTbInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_amountTbInputMethodTextChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_amountTbInputMethodTextChanged
+
+    private void amountTbKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_amountTbKeyReleased
+        // TODO add your handling code here:
+        GetFare();
+    }//GEN-LAST:event_amountTbKeyReleased
 
 
     /**

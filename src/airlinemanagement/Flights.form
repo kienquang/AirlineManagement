@@ -178,13 +178,21 @@
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="FCodeTb" alignment="0" min="-2" pref="25" max="-2" attributes="0"/>
-                      <Component id="FDate" alignment="1" min="-2" max="-2" attributes="0"/>
-                      <Component id="SeatsTb" alignment="1" min="-2" pref="27" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="FSourceCb" alignment="1" max="32767" attributes="0"/>
                       <Component id="FDestCb" alignment="1" max="32767" attributes="0"/>
-                      <Component id="FareTb" alignment="1" max="32767" attributes="0"/>
+                      <Component id="FareTb" alignment="0" max="32767" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <Component id="SeatsTb" min="-2" pref="30" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="FCodeTb" min="-2" max="-2" attributes="0"/>
+                              <Component id="FDate" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      </Group>
                   </Group>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -208,7 +216,7 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jScrollPane1" min="-2" pref="399" max="-2" attributes="0"/>
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -346,12 +354,11 @@
               <Color blue="0" green="0" red="cc" type="rgb"/>
             </Property>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="5">
+              <StringArray count="4">
                 <StringItem index="0" value="Ha Noi"/>
                 <StringItem index="1" value="Bangkok"/>
                 <StringItem index="2" value="Da Nang"/>
                 <StringItem index="3" value="TP.HCM"/>
-                <StringItem index="4" value=" "/>
               </StringArray>
             </Property>
           </Properties>
@@ -371,12 +378,11 @@
               <Color blue="0" green="0" red="cc" type="rgb"/>
             </Property>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="5">
+              <StringArray count="4">
                 <StringItem index="0" value="Ha Noi"/>
                 <StringItem index="1" value="Bangkok"/>
                 <StringItem index="2" value="Da Nang"/>
                 <StringItem index="3" value="TP.HCM"/>
-                <StringItem index="4" value=" "/>
               </StringArray>
             </Property>
           </Properties>
