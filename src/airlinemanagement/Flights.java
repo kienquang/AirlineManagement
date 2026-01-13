@@ -567,7 +567,13 @@ private void ExportToExcel() {
                         null,
                         "Source and destination cannot be the same.\nFlight date cannot be before today."
                     );
-                    
+                    return;
+                }
+                if(Integer.parseInt(SeatsTb.getText())<0){
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "Number of Seats cannot be less than zero."
+                    );
                     return;
                 }
                 Con = DBConnection.getConnection();
@@ -640,6 +646,13 @@ private void ExportToExcel() {
                         "Source and destination cannot be the same.\nFlight date cannot be before today."
                     );
                     
+                    return;
+                }
+                if(Integer.parseInt(SeatsTb.getText())<0){
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "Number of Seats cannot be less than zero."
+                    );
                     return;
                 }
                 Con = DBConnection.getConnection();
