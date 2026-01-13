@@ -604,7 +604,7 @@ private void ExportToExcel() {
     private void EditBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EditBtnMouseClicked
         if(Key == "")
         {
-            JOptionPane.showMessageDialog(this, "Select a Passenger");
+            JOptionPane.showMessageDialog(this, "Select a Flight");
         }else
         {
             try {
@@ -612,6 +612,7 @@ private void ExportToExcel() {
                 Con = DBConnection.getConnection();
                 String Query = "Update FlightTbl set FlCode=?, FlSource=?, FlDest=?, FlDate=?, FlSeats=?, Fare=? where FlCode=?";
                 PreparedStatement Add = Con.prepareStatement(Query);
+<<<<<<< HEAD
                 Add.setString(7, Key);
                 Add.setString(1, FCodeTb.getText());
                 Add.setString(2, FSourceCb.getSelectedItem().toString());
@@ -619,6 +620,16 @@ private void ExportToExcel() {
                 Add.setString(4, FDate.getDate().toString());
                 Add.setString(5, SeatsTb.getText());
                 Add.setString(6, FareTb.getText());
+=======
+                
+                Add.setString(1, FSourceCb.getSelectedItem().toString());
+                Add.setString(2, FDestCb.getSelectedItem().toString());
+                Add.setString(3, FDate.getDate().toString());
+                Add.setString(4, SeatsTb.getText());
+                Add.setString(5, FareTb.getText());
+                Add.setString(6, Key);
+                System.out.println("Da update flight code "+Key);
+>>>>>>> origin/huy
                 int row = Add.executeUpdate();
                 JOptionPane.showMessageDialog(this, "Flight Updated");
                 Con.close();
